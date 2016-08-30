@@ -10,7 +10,7 @@ class HTTP::Cookie::Scanner < StringScanner
   # be empty, capturing trailing whitespace.
   RE_NAME = /(?!#{RE_WSP})[^,;\\"=]*/
 
-  RE_BAD_CHAR = /([\x00-\x20\x7F,;\\])/
+  RE_BAD_CHAR = /([\x00-\x20\x7F",;\\])/
 
   # A pattern that matches the comma in a (typically date) value.
   RE_COOKIE_COMMA = /,(?=#{RE_WSP}?#{RE_NAME}=)/
@@ -23,7 +23,11 @@ class HTTP::Cookie::Scanner < StringScanner
   class << self
     def quote(s)
       return s unless s.match(RE_BAD_CHAR)
-      '"' << s.gsub(/([\\"])/, "\\\\\\1") << '"'
+      if s =~ /^\".*\"$/
+        return s
+      else
+        return '"' << s.gsub(/([\\"])/, "\\\\\\1") << '"'
+      end  
     end
   end
 
